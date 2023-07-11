@@ -13,7 +13,7 @@ from .jobs import Tasks
 def transform_context(func: discord.app_commands.Command):
     @functools.wraps(func)
     async def decorator(self, interaction, *args, **kwargs):
-        ctx = GIRContext(interaction)
+        ctx = ImperialContext(interaction)
         return await func(self, ctx, *args, **kwargs)
 
     return decorator
@@ -42,7 +42,7 @@ class PromptDataReaction:
         self.raw_emoji = raw_emoji
 
 
-class GIRContext:
+class ImperialContext:
     def __init__(self, interaction: discord.Interaction):
         self.interaction: discord.Interaction = interaction
         self.whisper = False
@@ -336,7 +336,7 @@ class GIRContext:
                     return reaction, reactor    
 
 
-class GIROldContext(commands.Context):
+class ImperialOldContext(commands.Context):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tasks: Tasks = self.bot.tasks

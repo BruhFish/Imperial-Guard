@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from data.services import guild_service, user_service
-from utils import cfg, GIRContext, transform_context
+from utils import cfg, ImperialContext, transform_context
 from utils.framework import admin_and_up, mod_and_up
 from utils.framework.checks import always_whisper
 from utils.framework.transformers import ModsAndAboveMemberOrUser
@@ -20,7 +20,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Add a new phrase to the raid filter")
     @app_commands.describe(phrase="Phrase to add")
     @transform_context
-    async def raid(self, ctx: GIRContext, phrase: str) -> None:
+    async def raid(self, ctx: ImperialContext, phrase: str) -> None:
         # these are phrases that when said by a whitename, automatically bans them.
         # for example: known scam URLs
         done = guild_service.add_raid_phrase(phrase)
@@ -33,7 +33,7 @@ class AntiRaid(commands.Cog):
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command(description="Add a list of (newline-separated) phrases to the raid filter.")
     @transform_context
-    async def batchraid(self, ctx: GIRContext) -> None:
+    async def batchraid(self, ctx: ImperialContext) -> None:
         modal = GenericDescriptionModal(ctx, author=ctx.author, title=f"New sub news post")
         await ctx.interaction.response.send_modal(modal)
         await modal.wait()
@@ -84,7 +84,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Remove a phrase from the raid filter.")
     @app_commands.describe(phrase="Phrase to remove")
     @transform_context
-    async def removeraid(self, ctx: GIRContext, phrase: str) -> None:
+    async def removeraid(self, ctx: ImperialContext, phrase: str) -> None:
         word = phrase.lower()
 
         words = guild_service.get_guild().raid_phrases
@@ -101,7 +101,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Toggle banning of *today's* new accounts in join spam detector.")
     @app_commands.describe(mode="True if you want to ban, false otherwise")
     @transform_context
-    async def spammode(self, ctx: GIRContext, mode: bool = None) -> None:
+    async def spammode(self, ctx: ImperialContext, mode: bool = None) -> None:
         if mode is None:
             mode = not guild_service.get_guild().ban_today_spam_accounts
 
@@ -114,7 +114,7 @@ class AntiRaid(commands.Cog):
     @app_commands.describe(user="User to verify")
     @app_commands.describe(mode="True if you want to verify, false otherwise")
     @transform_context
-    async def verify(self, ctx: GIRContext, user: discord.Member, mode: bool = None) -> None:
+    async def verify(self, ctx: ImperialContext, user: discord.Member, mode: bool = None) -> None:
         profile = user_service.get_user(user.id)
         if mode is None:
             profile.raid_verified = not profile.raid_verified
@@ -130,7 +130,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Lock a channel")
     @app_commands.describe(channel="Channel to lock")
     @transform_context
-    async def lock(self, ctx: GIRContext, channel: discord.TextChannel = None):
+    async def lock(self, ctx: ImperialContext, channel: discord.TextChannel = None):
         await ctx.interaction.response.defer()
         if channel is None:
             channel = ctx.channel
@@ -145,7 +145,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Unlock a channel")
     @app_commands.describe(channel="Channel to unlock")
     @transform_context
-    async def unlock(self,  ctx: GIRContext, channel: discord.TextChannel = None):
+    async def unlock(self,  ctx: ImperialContext, channel: discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
             
@@ -159,7 +159,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Mark a channel as automatically freezable during a raid")
     @app_commands.describe(channel="Channel to mark as freezable")
     @transform_context
-    async def freezeable(self,  ctx: GIRContext, channel: discord.TextChannel = None):
+    async def freezeable(self,  ctx: ImperialContext, channel: discord.TextChannel = None):
         channel = channel or ctx.channel
         if channel.id in guild_service.get_locked_channels():
             raise commands.BadArgument("That channel is already lockable.")
@@ -172,7 +172,7 @@ class AntiRaid(commands.Cog):
     @app_commands.command(description="Unmark a channel as freezable during a raid")
     @app_commands.describe(channel="Channel to unmark as freezable")
     @transform_context
-    async def unfreezeable(self,  ctx: GIRContext, channel: discord.TextChannel = None):
+    async def unfreezeable(self,  ctx: ImperialContext, channel: discord.TextChannel = None):
         channel = channel or ctx.channel
         if channel.id not in guild_service.get_locked_channels():
             raise commands.BadArgument("That channel isn't already lockable.")
@@ -225,7 +225,7 @@ class AntiRaid(commands.Cog):
         else:
             raise commands.BadArgument("Server is already unlocked or my permissions are wrong.")
 
-    async def lock_unlock_channel(self,  ctx: GIRContext, channel, lock=None):
+    async def lock_unlock_channel(self,  ctx: ImperialContext, channel, lock=None):
         db_guild = guild_service.get_guild()
         
         default_role = ctx.guild.default_role

@@ -70,7 +70,7 @@ class Config:
             logger.warning("Adding songs to public Spotify playlist disabled.")
 
         logger.info(
-            f"GIR will be running in: {self.guild_id} in \033[1m{'DEVELOPMENT' if self.dev else 'PRODUCTION'}\033[0m mode")
+            f"ImperialGuard will be running in: {self.guild_id} in \033[1m{'DEVELOPMENT' if self.dev else 'PRODUCTION'}\033[0m mode")
         logger.info(f"Bot owned by: {self.owner_id}")
 
     def setup_warning(self, k: str):

@@ -8,7 +8,7 @@ from data.services import guild_service, user_service
 from discord import app_commands
 from discord.ext import commands
 from discord.utils import format_dt
-from utils import GIRContext, cfg, transform_context
+from utils import ImperialContext, cfg, transform_context
 from utils.framework import (ModsAndAboveMember, admin_and_up, always_whisper,
                              guild_owner_and_up, mod_and_up)
 from utils.framework.transformers import ImageAttachment, ModsAndAboveMemberOrUser
@@ -25,7 +25,7 @@ class ModUtils(commands.Cog):
     @app_commands.command(description="Get information about a user (join/creation date, xp, etc.)")
     @app_commands.describe(member="The user to get information about")
     @transform_context
-    async def rundown(self, ctx: GIRContext, member: discord.Member):
+    async def rundown(self, ctx: ImperialContext, member: discord.Member):
         await ctx.respond_or_edit(embed=await self.prepare_rundown_embed(ctx, member))
 
     @admin_and_up()
@@ -34,7 +34,7 @@ class ModUtils(commands.Cog):
     @app_commands.describe(old_member="The user to transfer data from")
     @app_commands.describe(new_member="The user to transfer data to")
     @transform_context
-    async def transferprofile(self, ctx: GIRContext, old_member: ModsAndAboveMemberOrUser, new_member: ModsAndAboveMemberOrUser):
+    async def transferprofile(self, ctx: ImperialContext, old_member: ModsAndAboveMemberOrUser, new_member: ModsAndAboveMemberOrUser):
         if isinstance(old_member, int):
             try:
                 old_member = await self.bot.fetch_user(old_member)
@@ -73,7 +73,7 @@ class ModUtils(commands.Cog):
     @app_commands.command(description="Sets user's XP and Level to 0, freezes XP, sets warn points to 599")
     @app_commands.describe(member="The user to reset")
     @transform_context
-    async def clem(self, ctx: GIRContext, member: discord.Member):
+    async def clem(self, ctx: ImperialContext, member: discord.Member):
         if member.id == ctx.author.id:
             await ctx.send_error("You can't call that on yourself.")
             raise commands.BadArgument("You can't call that on yourself.")
@@ -108,7 +108,7 @@ class ModUtils(commands.Cog):
     @app_commands.command(description="Freeze a user's XP")
     @app_commands.describe(member="The user to freeze")
     @transform_context
-    async def freezexp(self, ctx: GIRContext, member: discord.Member):
+    async def freezexp(self, ctx: ImperialContext, member: discord.Member):
         results = user_service.get_user(member.id)
         results.is_xp_frozen = not results.is_xp_frozen
         results.save()
@@ -120,7 +120,7 @@ class ModUtils(commands.Cog):
     @app_commands.command(description="Ban a user from birthdays")
     @app_commands.describe(member="The member to ban")
     @transform_context
-    async def birthdayexclude(self, ctx: GIRContext, member: discord.Member):
+    async def birthdayexclude(self, ctx: ImperialContext, member: discord.Member):
         if member.id == self.bot.user.id:
             await ctx.send_error("You can't call that on me :(")
             raise commands.BadArgument("You can't call that on me :(")
@@ -145,7 +145,7 @@ class ModUtils(commands.Cog):
     @app_commands.command(description="Remove a user's birthday")
     @app_commands.describe(member="The member to remove the birthday from")
     @transform_context
-    async def removebirthday(self, ctx: GIRContext, member: discord.Member):
+    async def removebirthday(self, ctx: ImperialContext, member: discord.Member):
         if member.id == self.bot.user.id:
             await ctx.send_error("You can't call that on me :(")
             raise commands.BadArgument("You can't call that on me :(")
@@ -178,7 +178,7 @@ class ModUtils(commands.Cog):
     @app_commands.describe(date="The date of the birthday")
     @app_commands.autocomplete(date=date_autocompleter)
     @transform_context
-    async def setbirthday(self, ctx: GIRContext, member: discord.Member, month: str, date: int):
+    async def setbirthday(self, ctx: ImperialContext, member: discord.Member, month: str, date: int):
         month = MONTH_MAPPING.get(month)
         if month is None:
             raise commands.BadArgument("You gave an invalid date")
@@ -233,7 +233,7 @@ class ModUtils(commands.Cog):
     @app_commands.describe(command_name="The command to ban")
     @app_commands.autocomplete(command_name=command_list_autocomplete)
     @transform_context
-    async def command_ban(self, ctx: GIRContext, member: ModsAndAboveMember, command_name: str):
+    async def command_ban(self, ctx: ImperialContext, member: ModsAndAboveMember, command_name: str):
         final_command = ""
         command: typing.Union[app_commands.Command, app_commands.Group] = self.bot.tree.get_command(command_name.split()[0].lower(), guild=ctx.guild)
         if not command_name:
@@ -266,7 +266,7 @@ class ModUtils(commands.Cog):
     @app_commands.describe(channel="The channel to say it in")
     @transform_context
     @always_whisper
-    async def say(self, ctx: GIRContext, message: str, image: ImageAttachment = None, channel: discord.TextChannel = None):
+    async def say(self, ctx: ImperialContext, message: str, image: ImageAttachment = None, channel: discord.TextChannel = None):
         if channel is None:
             channel = ctx.channel
 
@@ -286,7 +286,7 @@ class ModUtils(commands.Cog):
                               description=f"In {ctx.channel.mention} {ctx.author.mention} said:\n\n{message}")
         await logging_channel.send(embed=embed)
 
-    async def prepare_rundown_embed(self, ctx: GIRContext, user):
+    async def prepare_rundown_embed(self, ctx: ImperialContext, user):
         user_info = user_service.get_user(user.id)
         rd = user_service.rundown(user.id)
         rd_text = ""
@@ -342,7 +342,7 @@ class ModUtils(commands.Cog):
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command(description="List all timed out users")
     @transform_context
-    async def viewmuted(self, ctx: GIRContext):
+    async def viewmuted(self, ctx: ImperialContext):
         muted_members = [user for user in ctx.guild.members if user.is_timed_out()]
 
         if not muted_members:

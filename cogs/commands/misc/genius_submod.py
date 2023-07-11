@@ -6,7 +6,7 @@ import discord
 from discord import app_commands
 from data.services import guild_service
 from discord.ext import commands
-from utils import GIRContext, cfg
+from utils import ImperialContext, cfg
 from utils.context import transform_context
 from utils.framework import genius_or_submod_and_up, whisper_in_general, submod_or_admin_and_up, ImageAttachment, gatekeeper
 from utils.views import CommonIssueModal, EditCommonIssue, issue_autocomplete, GenericDescriptionModal
@@ -58,7 +58,7 @@ class Genius(commands.Cog):
     @app_commands.describe(title="Title of the issue")
     @app_commands.describe(image="Image to show in issue")
     @transform_context
-    async def new(self, ctx: GIRContext, title: str,  image: ImageAttachment = None) -> None:
+    async def new(self, ctx: ImperialContext, title: str,  image: ImageAttachment = None) -> None:
         # get #common-issues channel
         channel = ctx.guild.get_channel(
             guild_service.get_guild().channel_common_issues)
@@ -90,7 +90,7 @@ class Genius(commands.Cog):
     @app_commands.autocomplete(title=issue_autocomplete)
     @app_commands.describe(image="Image to show in issue")
     @transform_context
-    async def edit(self, ctx: GIRContext, title: str, image: ImageAttachment = None) -> None:
+    async def edit(self, ctx: ImperialContext, title: str, image: ImageAttachment = None) -> None:
         channel = ctx.guild.get_channel(
             guild_service.get_guild().channel_common_issues)
         if not channel:
@@ -129,7 +129,7 @@ class Genius(commands.Cog):
     @app_commands.describe(channel="Channel to post the embed in")
     @app_commands.describe(image="Image to show in embed")
     @transform_context
-    async def postembed(self, ctx: GIRContext, title: str, channel: discord.TextChannel = None, image: ImageAttachment = None):
+    async def postembed(self, ctx: ImperialContext, title: str, channel: discord.TextChannel = None, image: ImageAttachment = None):
         post_channel = channel or ctx.channel
 
         # prompt the user for common issue body
@@ -151,7 +151,7 @@ class Genius(commands.Cog):
     @genius_or_submod_and_up()
     @common_issue.command(description="Repost common-issues table of contents")
     @transform_context
-    async def reindex(self, ctx: GIRContext):
+    async def reindex(self, ctx: ImperialContext):
         # get #common-issues channel
         channel: discord.TextChannel = ctx.guild.get_channel(
             guild_service.get_guild().channel_common_issues)
@@ -215,7 +215,7 @@ class Genius(commands.Cog):
     @app_commands.describe(message_id="ID of the message with the embed")
     @app_commands.describe(mobile_friendly="Whether to display the response in a mobile friendly format")
     @transform_context
-    async def rawembed(self, ctx: GIRContext, *, channel: discord.TextChannel, message_id: str, mobile_friendly: bool):
+    async def rawembed(self, ctx: ImperialContext, *, channel: discord.TextChannel, message_id: str, mobile_friendly: bool):
         try:
             message_id = int(message_id)
         except:
@@ -254,7 +254,7 @@ class Genius(commands.Cog):
     @app_commands.describe(user_to_mention="User to mention in the response")
     @transform_context
     @whisper_in_general
-    async def issue(self, ctx: GIRContext, title: str, user_to_mention: discord.Member = None):
+    async def issue(self, ctx: ImperialContext, title: str, user_to_mention: discord.Member = None):
         if title not in self.bot.issue_cache:
             raise commands.BadArgument(
                 "Issue not found! Title must match one of the embeds exactly, use autocomplete to help!")
@@ -283,7 +283,7 @@ class Genius(commands.Cog):
     @app_commands.command(description="Post a new subreddit news post")
     @app_commands.describe(image="Image to show in embed")
     @transform_context
-    async def subnews(self, ctx: GIRContext, image: ImageAttachment = None):
+    async def subnews(self, ctx: ImperialContext, image: ImageAttachment = None):
         db_guild = guild_service.get_guild()
 
         channel = ctx.guild.get_channel(db_guild.channel_subnews)
@@ -316,7 +316,7 @@ class Genius(commands.Cog):
     @app_commands.guilds(cfg.guild_id)
     @app_commands.command(description="Close a forum thread, usable by OP and Geniuses")
     @transform_context
-    async def solved(self, ctx: GIRContext):
+    async def solved(self, ctx: ImperialContext):
         if not isinstance(ctx.channel, discord.Thread) or not isinstance(ctx.channel.parent, discord.ForumChannel):
             raise commands.BadArgument("This command can only be called in a forum thread!")
 

@@ -6,7 +6,7 @@ import pytz
 from discord import app_commands
 from discord.ext import commands
 from data.services import user_service
-from utils import GIRContext, cfg, transform_context
+from utils import ImperialContext, cfg, transform_context
 from utils.framework import whisper, always_whisper
 from utils.views import timezone_autocomplete, Menu
 
@@ -62,7 +62,7 @@ class Timezones(commands.Cog):
     @app_commands.autocomplete(zone=timezone_autocomplete)
     @transform_context
     @whisper
-    async def _set(self, ctx: GIRContext, zone: str):
+    async def _set(self, ctx: ImperialContext, zone: str):
         if zone not in pytz.common_timezones_set:
             raise commands.BadArgument("Timezone was not found!")
 
@@ -79,7 +79,7 @@ class Timezones(commands.Cog):
     @timezone.command(name="remove", description="Remove your timezone from the database")
     @transform_context
     @whisper
-    async def remove(self, ctx: GIRContext):
+    async def remove(self, ctx: ImperialContext):
         db_user = user_service.get_user(ctx.author.id)
         db_user.timezone = None
         db_user.save()
@@ -89,7 +89,7 @@ class Timezones(commands.Cog):
     @timezone.command(name="view", description="View the local time in someone else's timezone")
     @app_commands.describe(member="Member to view time of")
     @transform_context
-    async def view(self, ctx: GIRContext, member: discord.Member):
+    async def view(self, ctx: ImperialContext, member: discord.Member):
         db_user = user_service.get_user(member.id)
         if db_user.timezone is None:
             raise commands.BadArgument(f"{member.mention} has not set a timezone!")
@@ -105,7 +105,7 @@ class Timezones(commands.Cog):
     @app_commands.autocomplete(country_code=timezone_country_autocomplete)
     @transform_context
     @always_whisper
-    async def _list(self, ctx: GIRContext, country_code: str = None):
+    async def _list(self, ctx: ImperialContext, country_code: str = None):
         ctx.country_code = country_code
         if country_code is None:
             timezones = list(pytz.common_timezones_set)

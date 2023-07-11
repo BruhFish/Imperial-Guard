@@ -6,7 +6,7 @@ from discord.ext import commands
 from discord import app_commands
 from discord.app_commands import AppCommandError, Command, ContextMenu, CommandInvokeError, TransformerError
 from extensions import initial_extensions
-from utils import cfg, db, logger, GIRContext, BanCache, IssueCache, Tasks, RuleCache, init_client_session, scam_cache
+from utils import cfg, db, logger, ImperialContext, BanCache, IssueCache, Tasks, RuleCache, init_client_session, scam_cache
 from utils.framework import PermissionsFailure, gatekeeper, find_triggered_filters
 from cogs.commands.context_commands import setup_context_commands
 
@@ -73,7 +73,7 @@ class MyTree(app_commands.CommandTree):
         db_user = user_service.get_user(interaction.user.id)
 
         if db_user.command_bans.get(command_name):
-            ctx = GIRContext(interaction)
+            ctx = ImperialContext(interaction)
             await ctx.send_error("You are not allowed to use that command!", whisper=True)
             return False
 
@@ -93,7 +93,7 @@ class MyTree(app_commands.CommandTree):
             message_content, interaction.user)
 
         if triggered_words:
-            ctx = GIRContext(interaction)
+            ctx = ImperialContext(interaction)
             await ctx.send_error("Your interaction contained a filtered word. Aborting!", whisper=True)
             return
 
@@ -104,7 +104,7 @@ bot = Bot(command_prefix='!', intents=intents, allowed_mentions=mentions, tree_c
 
 @bot.tree.error
 async def app_command_error(interaction: discord.Interaction, error: AppCommandError):
-    ctx = GIRContext(interaction)
+    ctx = ImperialContext(interaction)
     ctx.whisper = True
     if isinstance(error, CommandInvokeError):
         error = error.original
@@ -142,16 +142,13 @@ async def app_command_error(interaction: discord.Interaction, error: AppCommandE
 @bot.event
 async def on_ready():
     print("""
-                      88             
-                      ""             
-                                     
-           ,adPPYb,d8 88 8b,dPPYba,  
-          a8"    `Y88 88 88P'   "Y8  
-          8b       88 88 88          
-          "8a,   ,d88 88 88          
-           `"YbbdP"Y8 88 88          
-           aa,    ,88                
-            "Y8bbdP"              \n""")
+
+██╗███╗░░░███╗██████╗░███████╗██████╗░██╗░█████╗░██╗░░░░░  ░██████╗░██╗░░░██╗░█████╗░██████╗░██████╗░
+██║████╗░████║██╔══██╗██╔════╝██╔══██╗██║██╔══██╗██║░░░░░  ██╔════╝░██║░░░██║██╔══██╗██╔══██╗██╔══██╗
+██║██╔████╔██║██████╔╝█████╗░░██████╔╝██║███████║██║░░░░░  ██║░░██╗░██║░░░██║███████║██████╔╝██║░░██║
+██║██║╚██╔╝██║██╔═══╝░██╔══╝░░██╔══██╗██║██╔══██║██║░░░░░  ██║░░╚██╗██║░░░██║██╔══██║██╔══██╗██║░░██║
+██║██║░╚═╝░██║██║░░░░░███████╗██║░░██║██║██║░░██║███████╗  ╚██████╔╝╚██████╔╝██║░░██║██║░░██║██████╔╝
+╚═╝╚═╝░░░░░╚═╝╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═╝╚═╝░░╚═╝╚══════╝  ░╚═════╝░░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░ \n""")
     logger.info(
         f'Logged in as: {bot.user.name} - {bot.user.id} ({discord.__version__})')
     logger.info(f'Successfully logged in and booted...!')
@@ -164,6 +161,6 @@ async def on_ready():
 
 async def main():
     async with bot:
-        await bot.start(os.environ.get("GIR_TOKEN"), reconnect=True)
+        await bot.start(os.environ.get("IMPERIAL_TOKEN"), reconnect=True)
 
 asyncio.run(main())

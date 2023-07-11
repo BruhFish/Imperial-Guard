@@ -3,7 +3,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from data.services import guild_service
-from utils import GIRContext, cfg, transform_context, logger
+from utils import ImperialContext, cfg, transform_context, logger
 from utils.framework import admin_and_up, guild_owner_and_up
 from utils.framework.transformers import ImageAttachment
 
@@ -14,10 +14,10 @@ class Admin(commands.Cog):
 
     @admin_and_up()
     @app_commands.guilds(cfg.guild_id)
-    @app_commands.command(description="Change the bot's profile picture")
+    @app_commands.command(description="Change Imperial Guards profile picture")
     @app_commands.describe(image="Image to use as profile picture")
     @transform_context
-    async def setpfp(self, ctx: GIRContext, image: ImageAttachment):
+    async def setpfp(self, ctx: ImperialContext, image: ImageAttachment):
         await self.bot.user.edit(avatar=await image.read())
         await ctx.send_success("Done!", delete_after=5)
 

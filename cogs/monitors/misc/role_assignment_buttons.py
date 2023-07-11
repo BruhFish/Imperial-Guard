@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from data.services import guild_service
-from utils import cfg, GIRContext, PromptData, PromptDataReaction
+from utils import cfg, ImperialContext, PromptData, PromptDataReaction
 from utils.context import transform_context
 from utils.framework import admin_and_up
 from utils.views import ReactionRoleButton
@@ -33,7 +33,7 @@ class RoleAssignButtons(commands.Cog):
     @admin_and_up()
     @buttons.command(description="Post the button role assignment message")
     @transform_context
-    async def post_message(self, ctx: GIRContext):
+    async def post_message(self, ctx: ImperialContext):
         # timeout is None because we want this view to be persistent
         channel = ctx.guild.get_channel(
             guild_service.get_guild().channel_reaction_roles)
@@ -49,7 +49,7 @@ class RoleAssignButtons(commands.Cog):
     @buttons.command(name="set", description="Prompt to add role assignment buttons to a message")
     @app_commands.describe(message_id="ID of message to add buttons to")
     @transform_context
-    async def _set(self, ctx: GIRContext, message_id: str):
+    async def _set(self, ctx: ImperialContext, message_id: str):
         message_id = int(message_id)
         request_role_channel = ctx.guild.get_channel(
             guild_service.get_guild().channel_reaction_roles)
@@ -105,7 +105,7 @@ class RoleAssignButtons(commands.Cog):
     @buttons.command(description="Add a new role assignment button to a message")
     @app_commands.describe(message_id="Message to add reaction to")
     @transform_context
-    async def add(self, ctx: GIRContext, message_id: str):
+    async def add(self, ctx: ImperialContext, message_id: str):
         try:
             message_id = int(message_id)
         except Exception:
@@ -170,7 +170,7 @@ class RoleAssignButtons(commands.Cog):
             await message.edit(view=view)
         await ctx.send_success(title="Added new reaction!", description=resulting_reactions_list)
 
-    async def prompt_for_reaction(self, ctx: GIRContext, reactions):
+    async def prompt_for_reaction(self, ctx: ImperialContext, reactions):
         text = "Please add the reaction to this message that you want to watch for (or :white_check_mark: to finish or cancel if nothing set so far)"
         if reactions:
             text += "\n\n**Current reactions**"
@@ -205,7 +205,7 @@ class RoleAssignButtons(commands.Cog):
     @app_commands.describe(before="ID of message to move buttons from")
     @app_commands.describe(after="ID of new message")
     @transform_context
-    async def move(self, ctx: GIRContext, before: str, after: str):
+    async def move(self, ctx: ImperialContext, before: str, after: str):
         before, after = int(before), int(after)
 
         if before == after:
@@ -253,7 +253,7 @@ class RoleAssignButtons(commands.Cog):
     @admin_and_up()
     @buttons.command(description="Repost all buttons")
     @transform_context
-    async def repost(self, ctx: GIRContext):
+    async def repost(self, ctx: ImperialContext):
         channel = ctx.guild.get_channel(
             guild_service.get_guild().channel_reaction_roles)
 

@@ -1,7 +1,7 @@
-# GIR Rewrite
-![GIR banner](data/images/banner.png)
+# Imperial Guard
+![Imperial Guard banner](data/images/banner.png)
 
-GIR is a sophisticated moderation and miscellaneous utilities Discord bot created for the [r/Jailbreak Discord server](https://reddit.com/r/jailbreak). It features:
+Imperial Guard is a sophisticated moderation and miscellaneous utilities Discord bot created for the [iPad Discord server](https://discord.gg/ymxWb8W62Q). It features:
 
 - Completely based on Discord's Slash Commands, written in the [Discord.py library](https://github.com/Rapptz/discord.py)
 - Standard moderation commands such as warn, mute, kick, ban, ...
@@ -9,12 +9,9 @@ GIR is a sophisticated moderation and miscellaneous utilities Discord bot create
 - An advanced filter and anti-raid system
 - A logging and message mirroring system
 - Self-assignable roles
-- Miscellaneous utilities like `/canijailbreak`
 - And much more!
 
-GIR is custom made for the r/Jailbreak server and therefore there is no publicly running bot you can invite to your own server. However, you can self-host it as is or fork the code and modify it to your own requirements!
-
-> See also: [Bloo](https://github.com/DiscordGIR/Bloo) and [GIR](https://github.com/DiscordGIR/GIR)
+Imperial Guard is custom made for the iPad server and therefore there is no publicly running bot you can invite to your own server. However, you can self-host it as is or fork the code and modify it to your own requirements!
 
 ---
 
@@ -107,30 +104,3 @@ If setting up the database from scratch, follow these instructions:
 If you want to inspect or change database values:
 - If running MongoDB locally, you can install Robo3T.
 - If running MongoDB in Docker, you can use the web GUI at http://127.0.0.1:8081
-
----
-
-## Contributors
-
-<table>
-  <tr>
-    <td align="center"><a href="https://aamirfarooq.dev"><img src="https://avatars.githubusercontent.com/u/10660846?v=4" width="100px;" alt=""/><br /><sub><b>SlimShadyIAm</b></sub></a></td>
-    <td align="center"><a href="https://stkc.win"><img src="https://stkc.win/assets/pfp.png" width="100px;" alt=""/><br /><sub><b>stkc</b></sub></a></td>
-    <td align="center"><a href="https://github.com/Ultra03"><img src="https://avatars.githubusercontent.com/u/20672260?v=4" width="100px;" alt=""/><br /><sub><b>Ultra03</b></sub></a></td>
-    <td align="center"><a href="https://github.com/ja1dan"><img src="https://avatars.githubusercontent.com/u/37126748?v=4" width="100px;" alt=""/><br /><sub><b>ja1dan</b></sub></a></td>
-    <td align="center"><a href="https://github.com/donato-fiore"><img src="https://avatars.githubusercontent.com/u/50346119?v=4" width="100px;" alt=""/><br /><sub><b>donato-fiore</b></sub></a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="https://m1sta.xyz/"><img src="https://avatars.githubusercontent.com/u/37033149?v=4" width="100px;" alt=""/><br /><sub><b>m1stadev</b></sub></a></td>
-    <td align="center"><a href="https://saadat.dev/"><img src="https://avatars.githubusercontent.com/u/41216857?v=4" width="100px;" alt=""/><br /><sub><b>mass1ve-err0r</b></sub></a></td>
-    <td align="center"><a href="https://github.com/sqlstatement"><img src="https://avatars.githubusercontent.com/u/27446425?v=4" width="100px;" alt=""/><br /><sub><b>sqlstatement</b></sub></a></td>
-    <td align="center"><a href="https://github.com/beerpiss"><img src="https://avatars.githubusercontent.com/u/92439990?v=4" width="100px;" alt=""/><br /><sub><b>beerpsi</b></sub></a></td>
-  </tr>
-  </table>
-
-### Special thanks
-Special thanks to the following people for ideas, testing, or help:
-- [Jack LaFond](https://www.jack.link/) --- creator of [tunes.ninja](https://tunes.ninja/), the bot that the Songs cog is inspired by
-- Cameren from r/jb, who has given a lot of ideas and helped with testing on many occasions
-- [Lillie](https://github.com/LillieWeeb001/) --- creator of the [fake jailbreak and iCloud bypass list](https://github.com/LillieWeeb001/Anti-Scam-Json-List) used by GIR's filter
-- [Emma](https://github.com/emiyl) and the https://ios.cfw.guide team --- their API is used for miscellaneous commands such as `/canijailbreak`, `/deviceinfo`, `/devices add`, `/bypass` and more.

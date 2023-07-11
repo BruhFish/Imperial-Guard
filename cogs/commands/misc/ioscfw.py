@@ -3,7 +3,7 @@ import datetime
 import discord
 from discord import app_commands
 from discord.ext import commands
-from utils import (GIRContext, cfg, get_ios_cfw, get_ipsw_firmware_info,
+from utils import (ImperialContext, cfg, get_ios_cfw, get_ipsw_firmware_info,
                    transform_context, transform_groups)
 from utils.framework import whisper, whisper_in_general, whisper_outside_jb_and_geniusbar_unless_genius
 from utils.framework.transformers import (DeviceTransformer,
@@ -89,91 +89,12 @@ class iOSCFW(commands.Cog):
         self.bot = bot
 
     @app_commands.guilds(cfg.guild_id)
-    @app_commands.command(description="Get info about a jailbreak.")
-    @app_commands.describe(name="Name of the jailbreak")
-    @app_commands.autocomplete(name=jb_autocomplete)
-    @app_commands.describe(user_to_mention="User to ping in response")
-    @transform_context
-    @whisper_outside_jb_and_geniusbar_unless_genius
-    async def jailbreak(self, ctx: GIRContext, name: str, user_to_mention: discord.Member = None) -> None:
-        response = await get_ios_cfw()
-
-        jbs = response.get("jailbreak")
-        matching_jbs = [jb for jb in jbs if jb.get(
-            "name").lower() == name.lower()]
-        if not matching_jbs:
-            raise commands.BadArgument("No jailbreak found with that name.")
-
-        jb = matching_jbs[0]
-        info = jb.get('info')
-
-        color = info.get("color")
-        if color is not None:
-            color = int(color.replace("#", ""), 16)
-
-        embed = discord.Embed(title=jb.get(
-            'name'), color=color or discord.Color.random())
-        view = discord.ui.View()
-
-        if info is not None:
-            embed.set_thumbnail(url=f"https://appledb.dev{info.get('icon')}")
-
-            embed.add_field(
-                name="Version", value=info.get("latestVer"), inline=True)
-
-            if info.get("firmwares"):
-                soc = f"Works with {info.get('soc')}" if info.get(
-                    'soc') else ""
-
-                firmwares = info.get("firmwares")
-                if isinstance(firmwares, list):
-                    if len(firmwares) > 2:
-                        firmwares = ", ".join(firmwares)
-                    else:
-                        firmwares = " - ".join(info.get("firmwares"))
-                else:
-                    firmwares = info.get("firmwares")
-
-                embed.add_field(name="Compatible with",
-                                value=f'iOS {firmwares}\n{f"**{soc}**" if soc else ""}', inline=True)
-            else:
-                embed.add_field(name="Compatible with",
-                                value="Unavailable", inline=True)
-
-            embed.add_field(
-                name="Type", value=info.get("type"), inline=False)
-
-            if info.get("website") is not None:
-                view.add_item(discord.ui.Button(label='Website', url=info.get(
-                    "website").get("url"), style=discord.ButtonStyle.url))
-
-            if info.get('guide'):
-                for guide in info.get('guide'):
-                    if guide.get('validGuide'):
-                        view.add_item(discord.ui.Button(
-                            label=f'{guide.get("name")} Guide', url=f"https://ios.cfw.guide{guide.get('url')}", style=discord.ButtonStyle.url))
-            if info.get('notes') is not None:
-                embed.add_field(
-                    name="Notes", value=info.get('notes'), inline=False)
-
-            embed.set_footer(text="Powered by https://appledb.dev")
-        else:
-            embed.description = "No info available."
-
-        if user_to_mention is not None:
-            title = f"Hey {user_to_mention.mention}, have a look at this!"
-        else:
-            title = None
-
-        await ctx.respond_or_edit(content=title, embed=embed, ephemeral=ctx.whisper, view=view)
-
-    @app_commands.guilds(cfg.guild_id)
     @app_commands.command(description="Get info about an iOS version.")
     @app_commands.describe(version="Version to get info about")
     @app_commands.autocomplete(version=ios_version_autocomplete)
     @transform_context
     @whisper_in_general
-    async def firmware(self, ctx: GIRContext, version: str) -> None:
+    async def firmware(self, ctx: ImperialContext, version: str) -> None:
         response = await get_ios_cfw()
         og_version = version
         for os_version in ["iOS", "tvOS", "watchOS", "audioOS"]:
@@ -197,7 +118,7 @@ class iOSCFW(commands.Cog):
     @app_commands.autocomplete(version=ios_beta_version_autocomplete)
     @transform_context
     @whisper_in_general
-    async def betafirmware(self, ctx: GIRContext, version: str) -> None:
+    async def betafirmware(self, ctx: ImperialContext, version: str) -> None:
         response = await get_ios_cfw()
         og_version = version
         for os_version in ["iOS", "tvOS", "watchOS", "audioOS"]:
@@ -278,7 +199,7 @@ class iOSCFW(commands.Cog):
     @app_commands.autocomplete(device=device_autocomplete)
     @transform_context
     @whisper_in_general
-    async def deviceinfo(self, ctx: GIRContext, device: str) -> None:
+    async def deviceinfo(self, ctx: ImperialContext, device: str) -> None:
         response = await get_ios_cfw()
         all_devices = response.get("group")
         transformed_devices = transform_groups(all_devices)
@@ -345,86 +266,6 @@ class iOSCFW(commands.Cog):
                       url=f"https://appledb.dev/device/{matching_device_group.get('name').replace(' ', '-')}"))
 
         await ctx.respond(embed=embed, view=view, ephemeral=ctx.whisper)
-
-    @app_commands.guilds(cfg.guild_id)
-    @app_commands.command(description="Find out if you can jailbreak your device")
-    @app_commands.describe(device="Name or device identifier of the device")
-    @app_commands.autocomplete(device=jailbreakable_device_autocomplete)
-    @app_commands.describe(version="Version of iOS you want to jailbreak")
-    @app_commands.autocomplete(version=ios_on_device_autocomplete)
-    @transform_context
-    @whisper
-    async def canijailbreak(self, ctx: GIRContext, device: DeviceTransformer, version: VersionOnDevice) -> None:
-        response = await get_ios_cfw()
-        found_jbs = []
-        jailbreaks = response.get("jailbreak")
-        # jailbreaks = [jb for _, jb in jailbreaks.items()]
-        for jb in jailbreaks:
-            if jb.get("compatibility") is None:
-                continue
-
-            potential_version = None
-            for jb_version in jb.get("compatibility"):
-                if any(d in jb_version.get("devices") for d in device.get("devices")) and version.get("build") in jb_version.get("firmwares"):
-                    if potential_version is None:
-                        potential_version = jb_version
-                    elif potential_version.get("priority") is None and jb_version.get("priority") is not None:
-                        potential_version = jb_version
-                    elif potential_version.get("priority") is not None and jb_version.get("priority") is not None and jb_version.get("priority") < potential_version.get("priority"):
-                        potential_version = jb_version
-
-            if potential_version is not None:
-                jb["compatibility"] = [potential_version]
-                found_jbs.append(jb)
-
-        if not found_jbs:
-            embed = discord.Embed(
-                description=f"Sorry, **{device.get('name')}** is not jailbreakable on **{version.get('osStr')} {version.get('version')}**.", color=discord.Color.red())
-            await ctx.respond_or_edit(embed=embed, ephemeral=ctx.whisper)
-        else:
-            ctx.device = device.get("name")
-            ctx.device_id = device.get("key")
-            ctx.version = f'{version.get("osStr")} {version.get("version")}'
-            ctx.build = version.get("uniqueBuild")
-
-            if len(found_jbs) > 0:
-                def sort(x):
-                    if x.get("compatibility")[0].get("priority") is not None:
-                        return str(x.get("compatibility")[0].get("priority"))
-                    elif x.get("priority") is not None:
-                        return str(x.get("priority"))
-                    else:
-                        return str(x.get("name"))
-
-                found_jbs.sort(key=sort)
-
-            menu = CIJMenu(ctx, found_jbs, per_page=1, page_formatter=format_jailbreak_page,
-                           show_skip_buttons=False, whisper=ctx.whisper)
-            await menu.start()
-
-    @app_commands.guilds(cfg.guild_id)
-    @app_commands.command(description="Find out how to bypass jailbreak detection for an app")
-    @app_commands.describe(app="Name of the app")
-    @app_commands.autocomplete(app=bypass_autocomplete)
-    @transform_context
-    @whisper_in_general
-    async def bypass(self, ctx: GIRContext, app: str):
-        data = await get_ios_cfw()
-        bypasses = data.get('bypass')
-        matching_apps = [body for body in bypasses if app.lower() in body.get("name").lower() or app.lower() in body.get("bundleId").lower()]
-
-        if not matching_apps:
-            raise commands.BadArgument(
-                "The API does not recognize that app or there are no bypasses available.")
-
-        ctx.app = matching_apps[0]
-        bypasses = ctx.app.get("bypasses")
-        if not bypasses or bypasses is None or bypasses == [None]:
-            raise commands.BadArgument(
-                f"{ctx.app.get('name')} has no bypasses.")
-        menu = BypassMenu(ctx, ctx.app.get(
-            "bypasses"), per_page=1, page_formatter=format_bypass_page, whisper=ctx.whisper)
-        await menu.start()
 
 
 async def setup(bot):
